@@ -31,7 +31,7 @@ def create_qr(color):
     elif color=="Y":
         img = qr.make_image(fill_color = "darkkhaki", back_color = 'white')
     elif color=="B":
-        img = qr.make_image(fill_color = "darkblue", back_color = 'white')
+        img = qr.make_image(fill_color = "navy", back_color = 'white')
     elif color=="O":
         img = qr.make_image(fill_color = "darkorange", back_color = 'white')
     
