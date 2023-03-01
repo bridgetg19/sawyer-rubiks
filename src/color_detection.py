@@ -8,53 +8,65 @@ from pyzbar.pyzbar import decode
 
 from qr import *
 
+#draws 3x3 grid template on frame in video
+def draw_template(frame):
+    color=(0,0,255)
+    thickness = 5
+
+    x1, x2 = 285, 915
+    y1, y2 = 45, 675
+    cell_size = 210
+    
+    cv2.line(frame, (x1,y1), (x2,y1), color, thickness) #top
+    cv2.line(frame, (x1,y1), (x1,y2), color, thickness) #left
+    cv2.line(frame, (x1,y2), (x2,y2), color, thickness) #bottom
+    cv2.line(frame, (x2,y1), (x2,y2), color, thickness) #right
+
+    cv2.line(frame, (x1, y1+cell_size), (x2, y1+cell_size), color, thickness) #horizontal 1
+    cv2.line(frame, (x1, y1+(cell_size*2)), (x2, y1+(cell_size*2)), color, thickness) #horizontal 2
+    cv2.line(frame, (x1+cell_size, y1), (x1+cell_size, y2), color, thickness) #vertical 1
+    cv2.line(frame, (x1+(cell_size*2), y1), (x1+(cell_size*2), y2), color, thickness) #vertical 2
+
+
 #helper func: checks if data point d is inbetween values n1 and n2
 def inbetween(d, n1, n2):
     if d <= n2 and d >= n1:
         return True
     return False
 
-#represents a 3x3 rubiks cube face as string
 def get_rubiks_face_grid(data):
-    c00 = c01 = c02 = c11 = c12 = c20 = c21 = c22 = data[0].rect[0:2]
-    color00 = color01 = color02 = color10 = color11 = color12 = color20 = color21 = color22 = ""
+    x1, x2 = 285, 915
+    y1, y2 = 45, 675
+    cell_size = 210
+    color00 = color01 = color02 = color10 = color11 = color12 = color20 = color21 = color22 = b''
     
     #find qr code locations based on grid
     for i in range(len(data)):
-        if inbetween(data[i].rect[0], 400, 600) and inbetween(data[i].rect[1], 60, 260):
-            c00 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1, x1+cell_size) and inbetween(data[i].rect[1], y1, y1+cell_size):
             color00 = data[i].data
 
-        if inbetween(data[i].rect[0], 600, 800) and inbetween(data[i].rect[1], 60, 260):
-            c01 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1+cell_size, x1+cell_size*2) and inbetween(data[i].rect[1], y1, y1+cell_size):
             color01 = data[i].data
 
-        if inbetween(data[i].rect[0], 800, 1000) and inbetween(data[i].rect[1], 60, 260):
-            c02 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1+cell_size*2, x2) and inbetween(data[i].rect[1], y1, y1+cell_size):
             color02 = data[i].data
 
-        if inbetween(data[i].rect[0], 400, 600) and inbetween(data[i].rect[1], 260, 460):
-            c10 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1, x1+cell_size) and inbetween(data[i].rect[1], y1+cell_size, y1+cell_size*2):
             color10 = data[i].data
 
-        if inbetween(data[i].rect[0], 600, 800) and inbetween(data[i].rect[1], 260, 460):
-            c11 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1+cell_size, x1+cell_size*2) and inbetween(data[i].rect[1], y1+cell_size, y1+cell_size*2):
             color11 = data[i].data
 
-        if inbetween(data[i].rect[0], 800, 1000) and inbetween(data[i].rect[1], 260, 460):
-            c12 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1+cell_size*2, x2) and inbetween(data[i].rect[1], y1+cell_size, y1+cell_size*2):
             color12 = data[i].data
 
-        if inbetween(data[i].rect[0], 400, 600) and inbetween(data[i].rect[1], 460, 660):
-            c20 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1, x1+cell_size) and inbetween(data[i].rect[1], y1+cell_size*2, y2):
             color20 = data[i].data
 
-        if inbetween(data[i].rect[0], 600, 800) and inbetween(data[i].rect[1], 460, 660):
-            c21 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1+cell_size, x1+cell_size*2) and inbetween(data[i].rect[1], y1+cell_size*2, y2):
             color21 = data[i].data
 
-        if inbetween(data[i].rect[0], 800, 1000) and inbetween(data[i].rect[1], 460, 660):
-            c22 = data[i].rect[0:2]
+        if inbetween(data[i].rect[0], x1+cell_size*2, x2) and inbetween(data[i].rect[1], y1+cell_size*2, y2):
             color22 = data[i].data
 
     
@@ -84,24 +96,16 @@ def start_video():
 
         if ret:
             #draws 3x3 grid template on frame to help align qr codes
-            #(img, start, end, color, thickness)
-            cv2.line(frame, (400,60), (1000,60), (0,0,255), 9)
-            cv2.line(frame, (400,60), (400,660), (0,0,255), 9)
-            cv2.line(frame, (400,660), (1000,660), (0,0,255), 9)
-            cv2.line(frame, (1000,60), (1000,660), (0,0,255), 9)
-            cv2.line(frame, (400,260), (1000,260), (0,0,255), 9)
-            cv2.line(frame, (400,460), (1000,460), (0,0,255), 9)
-            cv2.line(frame, (600,60), (600,660), (0,0,255), 9)
-            cv2.line(frame, (800,60), (800,660), (0,0,255), 9)
-            
+            draw_template(frame)
+                    
             decodedObjects = decode(frame) #use pyzbar decode to find multiple qr codes
             if len(decodedObjects) == 9:
                 #once a frame finds all 9 qr codes successfully, save the image and break the while loop
                 cv2.imwrite("img/cam_ss.png", frame)
-                # data_ss = detect_multiple_qr(cv2.imread('img/cam_ss.png'))
                 print(get_rubiks_face_grid(decodedObjects))
                 
                 break
+
 
             for d in decodedObjects:
                 s = d.data.decode()
@@ -115,6 +119,12 @@ def start_video():
                                     cv2.FONT_HERSHEY_SIMPLEX, 2, (0, 0, 255), 2, cv2.LINE_AA)
                 
             cv2.imshow(window_name, frame) #display each frame
+
+
+        #to screenshot frame
+        if cv2.waitKey(delay) & 0xFF == ord('s'):
+            cv2.imwrite("img/frame_ss.png", frame)
+            break
 
             
         #to stop video, press 'q' key
