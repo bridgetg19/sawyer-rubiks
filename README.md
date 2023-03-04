@@ -1,6 +1,7 @@
 # sawyer-rubiks
 ### Installation
 ```
+pip install qrcode
 brew install zbar
 pip install opencv-python
 python -m pip install -U pip
