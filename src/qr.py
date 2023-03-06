@@ -25,15 +25,15 @@ def create_qr(color):
     if color=="W":
         img = qr.make_image(fill_color = "black", back_color = 'white')
     elif color=="R":
-        img = qr.make_image(fill_color = "red", back_color = 'white')
+        img = qr.make_image(fill_color = "black", back_color = '#FFC8C5')
     elif color=="G":
-        img = qr.make_image(fill_color = "green", back_color = 'white')
+        img = qr.make_image(fill_color = "black", back_color = '#C1F4B0')
     elif color=="Y":
-        img = qr.make_image(fill_color = "darkkhaki", back_color = 'white')
+        img = qr.make_image(fill_color = "black", back_color = '#FFF49C')
     elif color=="B":
-        img = qr.make_image(fill_color = "navy", back_color = 'white')
+        img = qr.make_image(fill_color = "black", back_color = '#CDF3F3')
     elif color=="O":
-        img = qr.make_image(fill_color = "darkorange", back_color = 'white')
+        img = qr.make_image(fill_color = "black", back_color = '#FFE1AE')
     
     # save it to a file img/<color>_qr.png
     img.save("img/"+color+"_qr.png")
