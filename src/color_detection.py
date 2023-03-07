@@ -28,19 +28,23 @@ def draw_template(frame):
     cv2.line(frame, (x1+(cell_size*2), y1), (x1+(cell_size*2), y2), color, thickness) #vertical 2
 
 
+
 #helper func: checks if data point d is inbetween values n1 and n2
 def inbetween(d, n1, n2):
     if d <= n2 and d >= n1:
         return True
     return False
 
-def get_rubiks_face_grid(data):
+
+
+#translates face of rubiks cube into string 
+def get_rubiks_face(data):
     x1, x2 = 285, 915
     y1, y2 = 45, 675
     cell_size = 210
-    color00 = color01 = color02 = color10 = color11 = color12 = color20 = color21 = color22 = b''
+    color00 = color01 = color02 = color10 = color11 = color12 = color20 = color21 = color22 = b'' #initialize as empty bytes
     
-    #find qr code locations based on grid
+    #for each decoded qr code in data, find qr code cell position based on top left coordinate of qr code
     for i in range(len(data)):
         if inbetween(data[i].rect[0], x1, x1+cell_size) and inbetween(data[i].rect[1], y1, y1+cell_size):
             color00 = data[i].data
@@ -87,9 +91,11 @@ def get_rubiks_face_grid(data):
 def start_video():
     camera_id = 0
     delay = 1
-    window_name = 'OpenCV pyzbar'
-
+    window_name = 'Read Rubiks Cube'
     cap = cv2.VideoCapture(camera_id) #define video capture obj
+
+    face_count = 0 #counter for number of frames successfully read
+
 
     while True:
         ret, frame = cap.read() #capture each frame
@@ -97,20 +103,35 @@ def start_video():
         if ret:
             #draws 3x3 grid template on frame to help align qr codes
             draw_template(frame)
+
+            #show text asking what face to show
+            text = "Show face" + str(face_count+1)
+            frame = cv2.putText(frame, text, (50,50), cv2.FONT_HERSHEY_SIMPLEX,
+                                2, (255, 0, 0), 2, cv2.LINE_AA)
+            
                     
             decodedObjects = decode(frame) #use pyzbar decode to find multiple qr codes
-            if len(decodedObjects) == 9:
-                #once a frame finds all 9 qr codes successfully, save the image and break the while loop
-                cv2.imwrite("img/cam_ss.png", frame)
-                print(get_rubiks_face_grid(decodedObjects))
+            if len(decodedObjects) == 9: #once a frame finds all 9 qr codes successfully, save the image and break the while loop
+                #save frame into img file
+                img_name = "img/face_" + str(face_count + 1) + ".png"
+                cv2.imwrite(img_name, frame)
+                print("saving file", img_name)
+
+                frame = cv2.putText(frame, "scanned successfully", (50,50), cv2.FONT_HERSHEY_SIMPLEX,
+                                2, (255, 0, 0), 2, cv2.LINE_AA)
                 
-                break
+                face_count += 1 #increment
+                
+                # cv2.imwrite("img/cam_ss.png", frame)
+                # print(get_rubiks_face(decodedObjects))
+
+                # break
 
 
             for d in decodedObjects:
                 s = d.data.decode()
                 # print(s)
-                
+            
                 #bound a green rectangle w/thicknesss = 3 around detected qr codes in the frame
                 frame = cv2.rectangle(frame, (d.rect.left, d.rect.top),
                                     (d.rect.left + d.rect.width, d.rect.top + d.rect.height), (0, 255, 0), 3)
@@ -131,9 +152,19 @@ def start_video():
         if cv2.waitKey(delay) & 0xFF == ord('q'):
             break
 
+        if face_count == 6:
+            print("got all sides")
+            break
+
 
     cap.release()
     cv2.destroyWindow(window_name)
 
 
-start_video()
+
+
+def main():
+    start_video()
+
+if __name__ == "__main__":
+    main()
