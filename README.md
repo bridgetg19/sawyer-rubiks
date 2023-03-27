@@ -2,8 +2,8 @@
 ### Installation
 ```
 pip install opencv-python
-python -m pip install -U pip
-python -m pip install -U matplotlib
+python3 -m pip install -U pip
+python3 -m pip install -U matplotlib
 pip install kociemba
 ```
 
