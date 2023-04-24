@@ -14,7 +14,7 @@ def get_color(hsv):
         color = "O"
     elif hue < 33:
         color = "Y"
-    elif hue < 90:
+    elif hue < 100:
         color = "G"
     elif hue < 131:
         color = "B"

@@ -59,4 +59,3 @@ def translate_string(rubiks_str):
 
 	return input_string
 
-

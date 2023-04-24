@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import kociemba
+import time
 
 from color_detect import *
 from kociemba_stuff import *
@@ -46,7 +47,7 @@ def draw_template(frame):
 
     #middle row
     cv2.circle(frame, (cx - cell_size - 30, cy), 10, color_blue, thickness)
-    cv2.circle(frame, (cx, cy), 10, color, thickness)
+    cv2.circle(frame, (cx, cy), 10, color_blue, thickness)
     cv2.circle(frame, (cx + cell_size + 30, cy), 10, color_blue, thickness)
 
     #bottom row
@@ -85,10 +86,9 @@ def net_cube(f1, f2, f3, f4, f5, f6):
     print(" "*7, "- "*5)
 
 
-
-# starts video to take image of each face of the cube (use 's' key input to save image)
+#--ignore  starts video to take image of each face of the cube (use 's' key input to save image)
 def start_video():
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
     face_count  = 0
@@ -125,13 +125,48 @@ def start_video():
     cv2.destroyAllWindows()
 
     return cell_centers
+ 
+def start_video_single(img_name):
+    try:
+        cap = cv2.VideoCapture(1)
+    except:
+        cap = cv2.VideoCapture(0)
+    # cap = cv2.VideoCapture(1)
+    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
+    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
+
+    while True:
+        _, frame = cap.read()
+        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+        cell_centers = get_cell_centers()
+
+        draw_template(frame)
+        
+        cv2.imshow('frame', frame)
+
+        #take ss and save image in "img/face_x.png"
+        time.sleep(3)
+        cv2.imwrite(img_name, frame)
+        print("saving file", img_name)
+        break
+
+        #quit out
+        key = cv2.waitKey(1) 
+        if key == ord('q'):
+            break
+
+    cap.release()
+    cv2.destroyAllWindows()
+
 
 
 def main():
-    #start video to get all sides
+#     #start video to get all sides
     start_video()
+#     start_video_single("img/face_1.png")
+#     # video_timer("img/face_1.png")
 
-    #take images from the video and determine the colors
+    # take images from the video and determine the colors
     cell_centers = get_cell_centers()
     f1, h1 = color_detect(cv2.imread('img/face_1.png'), cell_centers)
     f2, h2 = color_detect(cv2.imread('img/face_2.png'), cell_centers)
@@ -143,16 +178,31 @@ def main():
     #replace center tile of face 1 with "W" bc of logo
     f1[4] = 'W'
 
-    #print out cube state
-    net_cube(f1, f2, f3, f4, f5, f6)
+    print(f"f1: {f1}")
+    print(f"h1: {h1}")
+    print()
+    print(f"f2: {f2}")
+    print(f"h2: {h2}")
+    print()
+    print(f"f3: {f3}")
+    print(f"h3: {h3}")
+    print()
+    print(f"f4: {f4}")
+    print(f"h4: {h4}")
+    print()
+    print(f"f5: {f5}")
+    print(f"h5: {h5}")
+    print()
+    print(f"f6: {f6}")
+    print(f"h6: {h6}")
 
-    #concatenate all the faces together
+    # #concatenate all the faces together
     rubiks_cube = list_to_string(f1) + list_to_string(f2) + list_to_string(f3) + list_to_string(f4) + list_to_string(f5) + list_to_string(f6)
     
-    #translate string from WYROGB to UDRLFB
+    # #translate string from WYROGB to UDRLFB
     kociemba_input = translate_string(rubiks_cube)
 
-    #send to kociemba algorithm
+    # #send to kociemba algorithm
     print(kociemba.solve(kociemba_input))
 
 
