@@ -19,5 +19,9 @@ Make sure the robot is running in SawyerSDK mode.
 
 ### Usage
 ```
-python3 main.py
+Place cube with middle white square facing up and green middle square facing out.
+The camera must be facing with its bottom towards the robot.
+
+
+python3 src/main.py
 ```
