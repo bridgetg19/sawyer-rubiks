@@ -13,9 +13,11 @@ pip install kociemba
 ```
 Follow this link. Make sure to use Ubuntu 20.04: 
 https://support.rethinkrobotics.com/support/solutions/articles/80000980134-workstation-setup
+
+Make sure the robot is running in SawyerSDK mode.
 ```
 
 ### Usage
 ```
-python3 read_rubiks.py
+python3 main.py
 ```
