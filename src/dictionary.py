@@ -1,3 +1,5 @@
+# Dictionary used to record all joint positions for the robotic arm to solve the rubiks cube
+
 poses = {"rest": {
                     'right_j0': 0.6983154296875,
                     'right_j1': -0.47683984375,

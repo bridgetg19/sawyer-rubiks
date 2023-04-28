@@ -1,21 +1,3 @@
-#! /usr/bin/env python
-# Copyright (c) 2013-2018, Rethink Robotics Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-"""
-SDK Joint Position Example: keyboard
-"""
 import argparse
 
 import rospy
@@ -29,21 +11,17 @@ from kociemba_stuff import *
 from dictionary import poses as poses
 
 import intera_interface
-import intera_external_devices
-
-from intera_interface import CHECK_VERSION
 
 from intera_interface import (
     SimpleClickSmartGripper,
     get_current_gripper_interface,
-    Lights,
     Cuff,
-    RobotParams,
 )
 
 testKociembaString = "R U R’ U R U2 R’ U"
 
 
+# Based on keyboard gripper control example
 class GripperConnect(object):
     """
     Connects wrist button presses to gripper open/close commands.
@@ -88,18 +66,21 @@ class GripperConnect(object):
                    " Running cuff-light connection only.").format(arm.capitalize())
             rospy.logwarn(msg)
 
+    # Open gripper
     def _open_action(self, value):
         if value and self._gripper.is_ready():
             rospy.logdebug("gripper open triggered")
             if self._is_clicksmart:
                 self._gripper.set_ee_signal_value('grip', False)
-
+    
+    # Close gripper
     def _close_action(self, value):
         if value and self._gripper.is_ready():
             rospy.logdebug("gripper close triggered")
             if self._is_clicksmart:
                 self._gripper.set_ee_signal_value('grip', True)
 
+# Writes the current joint positions to the dictionary file. Used to record joint positions 
 def write_joint_positions(joints, limb):
     f = open('dictionary.py', 'a')
     f.write("{\n")
@@ -107,11 +88,13 @@ def write_joint_positions(joints, limb):
         f.write(f"\tjoints[{j}]: {limb.joint_angle(joints[j])},\n")
     f.write("}")
 
+# Prints the current joint positions. Used to record joint positions to move to
 def print_joint_positions(joints, limb):
     for j in range(len(joints)):
         print(f"joint",j," ",limb.joint_angle(joints[j]))
     print("")
 
+# Rotates the cube up
 def rotate_up(limb, grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -127,6 +110,7 @@ def rotate_up(limb, grip):
     limb.move_to_joint_positions(poses["u6"])
     limb.move_to_joint_positions(poses["rest"])
 
+# Rotates the cube down 
 def rotate_down(limb, grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -142,6 +126,7 @@ def rotate_down(limb, grip):
     limb.move_to_joint_positions(poses["d6"])
     limb.move_to_joint_positions(poses["rest"])
 
+# Rotates the cube to the right
 def rotate_right(limb, grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -157,6 +142,7 @@ def rotate_right(limb, grip):
     limb.move_to_joint_positions(poses["r6"])
     limb.move_to_joint_positions(poses["rest"])
 
+# Rotates the cube to the left
 def rotate_left(limb, grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -172,6 +158,7 @@ def rotate_left(limb, grip):
     limb.move_to_joint_positions(poses["l6"])
     limb.move_to_joint_positions(poses["rest"])
 
+# Turns the bottom face 90 degrees clockwise
 def clockwise_turn(limb, grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -187,6 +174,7 @@ def clockwise_turn(limb, grip):
     time.sleep(1)
     limb.move_to_joint_positions(poses["rest"])
 
+# Turns the bottom face 90 degrees counter clockwise
 def c_clockwise_turn(limb, grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -202,6 +190,7 @@ def c_clockwise_turn(limb, grip):
     time.sleep(1)
     limb.move_to_joint_positions(poses["rest"])
 
+# From the front face, rotates the cube to the back face
 def rotate_to_back(limb, grip):
     rotate_right(limb,grip)
     rotate_right(limb,grip)
@@ -209,10 +198,12 @@ def rotate_to_back(limb, grip):
 def test_move(limb, grip):
     rotate_left(limb,grip)
 
+# From the front back face, rotates the cube to the front face
 def rotate_to_front(limb, grip):
     rotate_left(limb,grip)
     rotate_left(limb,grip)
 
+# Turns the bottom face 180 degrees
 def turn_180(limb,grip):
     grip[0]._open_action(True)
     limb.move_to_joint_positions(poses["rest"])
@@ -227,6 +218,7 @@ def turn_180(limb,grip):
     limb.move_to_joint_positions(poses["2c5"])
     limb.move_to_joint_positions(poses["rest"])
 
+# Given a reference to limb and grip, uses the arm to move the cube to various positions and takes pictures of each side
 def scan_cube(limb, grip):
     rotate_up(limb, grip)
     rotate_up(limb, grip)
@@ -260,22 +252,18 @@ def scan_cube(limb, grip):
     rotate_down(limb,grip)
     print("Done scanning")
 
-
-
+# Overall solve function. Scans the cube, detects colors, and solve 
 def start_solve(side, args, valid_limbs):
     limb = intera_interface.Limb(side)
 
-    joints = limb.joint_names()
-
+    # Create gripper object
     arms = (args.gripper,) if args.gripper != 'all_limbs' else valid_limbs[:-1]
     grip_ctrls = [GripperConnect(arm, args.lights) for arm in arms]
 
+    # Set move speed to 25%
     limb.set_joint_position_speed(.25)
 
-    joints = limb.joint_names()
-
-    #test_move(limb,grip_ctrls)
-
+    # Scan all sides of the cube
     scan_cube(limb, grip_ctrls)
 
     print("Detecting colors")
@@ -300,10 +288,11 @@ def start_solve(side, args, valid_limbs):
     print(rubiks_cube)
     print(kociemba_input)
 
-    #send to kociemba algorithm
-    kociemba_move(kociemba_input, limb, grip_ctrls)
+    #send to kociemba algorithm and solve rubiks cube
+    kociemba_sol = kociemba(kociemba_input)
+    kociemba_move(kociemba_sol, limb, grip_ctrls)
 
-
+# Using the kociemba solve string, call all moves needed to solve the rubiks cube
 def kociemba_move(solve_string, limb, grip):
     moves = solve_string.split(" ")
     i = 0
@@ -344,21 +333,10 @@ def kociemba_move(solve_string, limb, grip):
         elif move[0] == "B":
             rotate_to_front(limb, grip)
 
-    
-    
-
+# Program that uses the sawyer robotic arm to solve a rubiks cube
+# Based on the keyboard gripper control example provided by sawyer
 def main():
-    """RSDK Joint Position Example: Keyboard Control
-
-    Use your dev machine's keyboard to control joint positions.
-
-    Each key corresponds to increasing or decreasing the angle
-    of a joint on Sawyer's arm. The increasing and descreasing
-    are represented by number key and letter key next to the number.
-    """
-    epilog = """
-See help inside the example with the '?' key for key bindings.
-    """
+    epilog = ""
     rp = intera_interface.RobotParams()
     valid_limbs = rp.get_limb_names()
     if not valid_limbs:
