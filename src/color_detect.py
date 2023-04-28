@@ -14,7 +14,7 @@ def get_color(hsv):
         color = "O"
     elif hue < 33:
         color = "Y"
-    elif hue < 100:
+    elif hue < 90:
         color = "G"
     elif hue < 131:
         color = "B"
@@ -23,7 +23,7 @@ def get_color(hsv):
     else:
         color = "W"
 
-    if saturation < 75:
+    if saturation < 65:
         color = "W"
 
     return color

@@ -35,25 +35,24 @@ def get_cell_centers():
 
 # draws the 3x3 grid template on frame in video
 def draw_template(frame):
-    color=(255,0,0)
     thickness = 5
-    color_blue = (0,255,0)
+    color = (0,255,0)
 
     # cv2.circle(image, center_coordinates, radius, color, thickness)
     #top row
-    cv2.circle(frame, (cx - cell_size - 30, cy - cell_size - 30), 10, color_blue, thickness)
-    cv2.circle(frame, (cx, cy - cell_size - 30), 10, color_blue, thickness)
-    cv2.circle(frame, (cx + cell_size + 30, cy - cell_size - 30), 10, color_blue, thickness)
+    cv2.circle(frame, (cx - cell_size - 30, cy - cell_size - 30), 10, color, thickness)
+    cv2.circle(frame, (cx, cy - cell_size - 30), 10, color, thickness)
+    cv2.circle(frame, (cx + cell_size + 30, cy - cell_size - 30), 10, color, thickness)
 
     #middle row
-    cv2.circle(frame, (cx - cell_size - 30, cy), 10, color_blue, thickness)
-    cv2.circle(frame, (cx, cy), 10, color_blue, thickness)
-    cv2.circle(frame, (cx + cell_size + 30, cy), 10, color_blue, thickness)
+    cv2.circle(frame, (cx - cell_size - 30, cy), 10, color, thickness)
+    cv2.circle(frame, (cx, cy), 10, color, thickness)
+    cv2.circle(frame, (cx + cell_size + 30, cy), 10, color, thickness)
 
     #bottom row
-    cv2.circle(frame, (cx - cell_size - 30, cy + cell_size + 30), 10, color_blue, thickness)
-    cv2.circle(frame, (cx, cy + cell_size + 30), 10, color_blue, thickness)
-    cv2.circle(frame, (cx + cell_size + 30, cy + cell_size + 30), 10, color_blue, thickness)
+    cv2.circle(frame, (cx - cell_size - 30, cy + cell_size + 30), 10, color, thickness)
+    cv2.circle(frame, (cx, cy + cell_size + 30), 10, color, thickness)
+    cv2.circle(frame, (cx + cell_size + 30, cy + cell_size + 30), 10, color, thickness)
 
 
 #prints out flattened out version of cube
@@ -86,46 +85,7 @@ def net_cube(f1, f2, f3, f4, f5, f6):
     print(" "*7, "- "*5)
 
 
-#--ignore  starts video to take image of each face of the cube (use 's' key input to save image)
-def start_video():
-    cap = cv2.VideoCapture(1)
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
-    face_count  = 0
-
-    while True:
-        _, frame = cap.read()
-        hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        cell_centers = get_cell_centers()
-
-        draw_template(frame)
-        
-        cv2.imshow('frame', frame)
-
-        #take ss and save image in "img/face_x.png"
-        key = cv2.waitKey(1)
-        if key == ord('s'):
-            img_name = "img/face_" + str(face_count + 1) + ".png"
-            cv2.imwrite(img_name, frame)
-            print("saving file", img_name)
-
-            face_count += 1
-
-
-        if face_count == 6:
-            print("read all 6 sides, exiting")
-            break
-
-        #quit out
-        key = cv2.waitKey(1) 
-        if key == ord('q'):
-            break
-
-    cap.release()
-    cv2.destroyAllWindows()
-
-    return cell_centers
- 
+# starts video to take picture of side of rubiks cube
 def start_video_single(img_name):
     try:
         cap = cv2.VideoCapture(1)
@@ -158,54 +118,3 @@ def start_video_single(img_name):
     cap.release()
     cv2.destroyAllWindows()
 
-
-
-def main():
-#     #start video to get all sides
-    start_video()
-#     start_video_single("img/face_1.png")
-#     # video_timer("img/face_1.png")
-
-    # take images from the video and determine the colors
-    cell_centers = get_cell_centers()
-    f1, h1 = color_detect(cv2.imread('img/face_1.png'), cell_centers)
-    f2, h2 = color_detect(cv2.imread('img/face_2.png'), cell_centers)
-    f3, h3 = color_detect(cv2.imread('img/face_3.png'), cell_centers)
-    f4, h4 = color_detect(cv2.imread('img/face_4.png'), cell_centers)
-    f5, h5 = color_detect(cv2.imread('img/face_5.png'), cell_centers)
-    f6, h6 = color_detect(cv2.imread('img/face_6.png'), cell_centers)
-
-    #replace center tile of face 1 with "W" bc of logo
-    f1[4] = 'W'
-
-    print(f"f1: {f1}")
-    print(f"h1: {h1}")
-    print()
-    print(f"f2: {f2}")
-    print(f"h2: {h2}")
-    print()
-    print(f"f3: {f3}")
-    print(f"h3: {h3}")
-    print()
-    print(f"f4: {f4}")
-    print(f"h4: {h4}")
-    print()
-    print(f"f5: {f5}")
-    print(f"h5: {h5}")
-    print()
-    print(f"f6: {f6}")
-    print(f"h6: {h6}")
-
-    # #concatenate all the faces together
-    rubiks_cube = list_to_string(f1) + list_to_string(f2) + list_to_string(f3) + list_to_string(f4) + list_to_string(f5) + list_to_string(f6)
-    
-    # #translate string from WYROGB to UDRLFB
-    kociemba_input = translate_string(rubiks_cube)
-
-    # #send to kociemba algorithm
-    print(kociemba.solve(kociemba_input))
-
-
-
-if __name__ == "__main__":
-    main()
