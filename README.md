@@ -22,6 +22,8 @@ Make sure the robot is running in SawyerSDK mode.
 Place cube with middle white square facing away from the robot and green middle square facing down.
 The camera must be facing with its bottom towards the robot.
 
+Run `roscore` in a terminal to start roscore
 
-python3 src/main.py
+In a new terminal, run
+`python3 src/main.py`
 ```
