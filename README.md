@@ -19,7 +19,7 @@ Make sure the robot is running in SawyerSDK mode.
 
 ### Usage
 ```
-Place cube with middle white square facing up and green middle square facing out.
+Place cube with middle white square facing away from the robot and green middle square facing down.
 The camera must be facing with its bottom towards the robot.
 
 
