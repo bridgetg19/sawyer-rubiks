@@ -12,18 +12,18 @@ def get_color(hsv):
         color = "R"
     elif hue < 22:
         color = "O"
-    elif hue < 33:
+    elif hue < 60: #used to be 33, might go to 60
         color = "Y"
     elif hue < 90:
         color = "G"
-    elif hue < 131:
+    elif hue < 131 and saturation > 150:
         color = "B"
-    elif hue < 180:
+    elif hue < 180 and saturation > 125:
         color = "R"
     else:
         color = "W"
 
-    if saturation < 65:
+    if saturation < 80:
         color = "W"
 
     return color

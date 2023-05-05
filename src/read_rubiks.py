@@ -42,7 +42,8 @@ def draw_template(frame):
     #top row
     cv2.circle(frame, (cx - cell_size - 30, cy - cell_size - 30), 10, color, thickness)
     cv2.circle(frame, (cx, cy - cell_size - 30), 10, color, thickness)
-    cv2.circle(frame, (cx + cell_size + 30, cy - cell_size - 30), 10, color, thickness)
+    # cv2.circle(frame, (cx + cell_size + 30, cy - cell_size - 30), 10, color, thickness)
+    cv2.circle(frame, (cx + cell_size + 15, cy - cell_size - 30), 10, (0,0, 255), thickness)
 
     #middle row
     cv2.circle(frame, (cx - cell_size - 30, cy), 10, color, thickness)
@@ -52,7 +53,8 @@ def draw_template(frame):
     #bottom row
     cv2.circle(frame, (cx - cell_size - 30, cy + cell_size + 30), 10, color, thickness)
     cv2.circle(frame, (cx, cy + cell_size + 30), 10, color, thickness)
-    cv2.circle(frame, (cx + cell_size + 30, cy + cell_size + 30), 10, color, thickness)
+    # cv2.circle(frame, (cx + cell_size + 30, cy + cell_size + 30), 10, color, thickness)
+    cv2.circle(frame, (cx + cell_size + 15, cy + cell_size + 15), 10, (0,0,255), thickness)
 
 
 #prints out flattened out version of cube
@@ -87,11 +89,11 @@ def net_cube(f1, f2, f3, f4, f5, f6):
 
 # starts video to take picture of side of rubiks cube
 def start_video_single(img_name):
-    try:
-        cap = cv2.VideoCapture(1)
-    except:
-        cap = cv2.VideoCapture(0)
-    # cap = cv2.VideoCapture(1)
+    # try:
+    #     cap = cv2.VideoCapture(1)
+    # except:
+    #     cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
@@ -117,4 +119,3 @@ def start_video_single(img_name):
 
     cap.release()
     cv2.destroyAllWindows()
-

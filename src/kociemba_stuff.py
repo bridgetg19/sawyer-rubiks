@@ -47,15 +47,13 @@ def translate_string(rubiks_str):
 				ord("G"):ord("F"), 
 				ord("B"):ord("B") }
 
-	print("original string: ", rubiks_str)
+	print("original rubik's cube state: ", rubiks_str)
 
 	input_string = rubiks_str.translate(mydict)
 
 	if not validate_string(input_string):
 		print("not valid string")
 		exit(1)
-
-	# print("kociemba.solve('"+ input_string + "')")
 
 	return input_string
 

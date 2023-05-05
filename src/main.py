@@ -11,6 +11,7 @@ from kociemba_stuff import *
 from dictionary import poses as poses
 
 import intera_interface
+from intera_interface import CHECK_VERSION
 
 from intera_interface import (
     SimpleClickSmartGripper,
@@ -213,14 +214,17 @@ def turn_180(limb,grip):
     time.sleep(1)
     limb.move_to_joint_positions(poses["2c3"])
     limb.move_to_joint_positions(poses["2c4"])
+    limb.move_to_joint_positions(poses["2c5"])
+    limb.move_to_joint_positions(poses["2c6"])
     grip[0]._open_action(True)
     time.sleep(1)
-    limb.move_to_joint_positions(poses["2c5"])
+    limb.move_to_joint_positions(poses["2c7"])
     limb.move_to_joint_positions(poses["rest"])
 
 # Given a reference to limb and grip, uses the arm to move the cube to various positions and takes pictures of each side
 def scan_cube(limb, grip):
-    rotate_up(limb, grip)
+    #rotate_down(limb, grip)
+    start_video_single("img/init_cam.png")
     rotate_up(limb, grip)
     #take picture of up
     start_video_single("img/face_1.png")
@@ -249,7 +253,7 @@ def scan_cube(limb, grip):
     start_video_single("img/face_6.png")
     rotate_left(limb, grip)
     rotate_left(limb, grip)
-    rotate_down(limb,grip)
+    #rotate_down(limb,grip)
     print("Done scanning")
 
 # Overall solve function. Scans the cube, detects colors, and solve 
@@ -275,21 +279,30 @@ def start_solve(side, args, valid_limbs):
     f4, h4 = color_detect(cv2.imread('img/face_4.png'), cell_centers)
     f5, h5 = color_detect(cv2.imread('img/face_5.png'), cell_centers)
     f6, h6 = color_detect(cv2.imread('img/face_6.png'), cell_centers)
-    print("Detected all colors")
 
     #replace center tile of face 1 with "W" bc of logo
     f1[4] = 'W'
+
+    #print results
+    print("Detected all colors")
+    print(f"f1: {f1}\nhue: {h1}\n")
+    print(f"f2: {f2}\nhue: {h2}\n")
+    print(f"f3: {f3}\nhue: {h3}\n")
+    print(f"f4: {f4}\nhue: {h4}\n")
+    print(f"f5: {f5}\nhue: {h5}\n")
+    print(f"f6: {f6}\nhue: {h6}\n")
 
     #concatenate all the faces together
     rubiks_cube = list_to_string(f1) + list_to_string(f2) + list_to_string(f3) + list_to_string(f4) + list_to_string(f5) + list_to_string(f6)
     
     #translate string from WYROGB to UDRLFB
     kociemba_input = translate_string(rubiks_cube)
-    print(rubiks_cube)
-    print(kociemba_input)
+    # print(rubiks_cube)
+    print("translated string:",kociemba_input)
 
     #send to kociemba algorithm and solve rubiks cube
-    kociemba_sol = kociemba(kociemba_input)
+    kociemba_sol = kociemba.solve(kociemba_input)
+    print(f"Kociemba solution: {kociemba_sol}")
     kociemba_move(kociemba_sol, limb, grip_ctrls)
 
 # Using the kociemba solve string, call all moves needed to solve the rubiks cube
@@ -297,7 +310,7 @@ def kociemba_move(solve_string, limb, grip):
     moves = solve_string.split(" ")
     i = 0
     for move in moves:
-        print(f"Move {i} of {len(moves)}, \"{move}\"")
+        print(f"Move {i+1} of {len(moves)}, \"{move}\"")
         #Move to required face
         if move[0] == "R":
             rotate_right(limb, grip)
@@ -332,6 +345,8 @@ def kociemba_move(solve_string, limb, grip):
             rotate_up(limb, grip)
         elif move[0] == "B":
             rotate_to_front(limb, grip)
+        
+        i+=1
 
 # Program that uses the sawyer robotic arm to solve a rubiks cube
 # Based on the keyboard gripper control example provided by sawyer
