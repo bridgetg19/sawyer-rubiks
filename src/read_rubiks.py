@@ -42,8 +42,8 @@ def draw_template(frame):
     #top row
     cv2.circle(frame, (cx - cell_size - 30, cy - cell_size - 30), 10, color, thickness)
     cv2.circle(frame, (cx, cy - cell_size - 30), 10, color, thickness)
-    # cv2.circle(frame, (cx + cell_size + 30, cy - cell_size - 30), 10, color, thickness)
-    cv2.circle(frame, (cx + cell_size + 15, cy - cell_size - 30), 10, (0,0, 255), thickness)
+    # cv2.circle(frame, (cx + cell_size + 30, cy - cell_size - 30), 10, color, thickness) #original location
+    cv2.circle(frame, (cx + cell_size + 15, cy - cell_size - 30), 10, color, thickness) #moved lower to avoid shadow
 
     #middle row
     cv2.circle(frame, (cx - cell_size - 30, cy), 10, color, thickness)
@@ -53,8 +53,8 @@ def draw_template(frame):
     #bottom row
     cv2.circle(frame, (cx - cell_size - 30, cy + cell_size + 30), 10, color, thickness)
     cv2.circle(frame, (cx, cy + cell_size + 30), 10, color, thickness)
-    # cv2.circle(frame, (cx + cell_size + 30, cy + cell_size + 30), 10, color, thickness)
-    cv2.circle(frame, (cx + cell_size + 15, cy + cell_size + 15), 10, (0,0,255), thickness)
+    # cv2.circle(frame, (cx + cell_size + 30, cy + cell_size + 30), 10, color, thickness) #original location
+    cv2.circle(frame, (cx + cell_size + 15, cy + cell_size + 15), 10, color, thickness) #moved higher to avoid shadow
 
 
 #prints out flattened out version of cube
@@ -93,7 +93,7 @@ def start_video_single(img_name):
     #     cap = cv2.VideoCapture(1)
     # except:
     #     cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture(1)
+    cap = cv2.VideoCapture(1) #if cvt assert error, change camera index to 0 or 1 !!!
     cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 
@@ -102,12 +102,11 @@ def start_video_single(img_name):
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         cell_centers = get_cell_centers()
 
-        draw_template(frame)
+        draw_template(frame) #draw grid template on frame
         
         cv2.imshow('frame', frame)
 
-        #take ss and save image in "img/face_x.png"
-        time.sleep(3)
+        time.sleep(3) #wait 3 seconds and save image of face of rubiks cube in "img/face_x.png"
         cv2.imwrite(img_name, frame)
         print("saving file", img_name)
         break
