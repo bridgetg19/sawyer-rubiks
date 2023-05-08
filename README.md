@@ -33,4 +33,5 @@ To start the solve.
 ```
 - Sometimes the error of cube placement accumulates and certain moves will cause the cube to sit out of place in the mount.
 - The control box will time out after extensive use. Reboot the control box to fix. 
+- Camera index may need to be switched (to either 0 or 1) in read_rubiks.py start_video_single() if this error occurs: (-215:Assertion failed) !_src.empty() in function 'cvtColor'
 ```
